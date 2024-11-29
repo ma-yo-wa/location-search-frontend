@@ -10,10 +10,13 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   const [location, setLocation] = useState<{ latitude: number; longitude: number }>({ latitude: 0, longitude: 0 })
   const [isLocating, setIsLocating] = useState(false)
   const [showCoordinates, setShowCoordinates] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string | undefined }>({})
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSearch(query, location)
+    if (validateInputs()) {
+      await onSearch(query, location)
+    }
   }
 
   const getCurrentLocation = () => {
@@ -41,22 +44,69 @@ export function SearchBar({ onSearch }: SearchBarProps) {
     }
   }
 
+  const validateInputs = (): boolean => {
+    const newErrors: typeof errors = {};
+    const hasSearchQuery = query.trim().length > 0;
+    const hasLatitude = location.latitude !== 0;
+    const hasLongitude = location.longitude !== 0;
+
+   
+    if (!hasSearchQuery && !hasLatitude && !hasLongitude) {
+      newErrors.query = "Please enter a search term or coordinates";
+      return false;
+    }
+
+    if (hasLatitude !== hasLongitude) {
+      if (!hasLongitude) {
+        newErrors.longitude = "Longitude is required when Latitude is provided";
+      } else {
+        newErrors.latitude = "Latitude is required when Longitude is provided";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleCoordinateChange = (type: 'latitude' | 'longitude', value: string) => {
+    setErrors(prev => ({ ...prev, [type]: undefined }));
+    
     if (value === '') {
       setLocation(prev => ({
         ...prev,
         [type]: 0
-      }))
-      return
+      }));
+      return;
     }
-    const numValue = parseFloat(value)
+
+    const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
-      setLocation(prev => ({
-        ...prev,
-        [type]: numValue
-      }))
+      const isValid = type === 'latitude' 
+        ? numValue >= -90 && numValue <= 90
+        : numValue >= -180 && numValue <= 180;
+
+      if (isValid) {
+        setLocation(prev => ({
+          ...prev,
+          [type]: numValue
+        }));
+      }
     }
-  }
+  };
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors.query;
+      return newErrors;
+    });
+    setQuery(e.target.value);
+    
+    // If user starts typing a search query, clear coordinates
+    if (e.target.value.trim().length >= 2) {
+      setLocation({ latitude: 0, longitude: 0 });
+    }
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -67,9 +117,14 @@ export function SearchBar({ onSearch }: SearchBarProps) {
               type="text"
               placeholder="Search locations..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg"
+              onChange={handleQueryChange}
+              className={`w-full px-4 py-2 border rounded-lg ${
+                errors.query ? 'border-red-500' : 'border-gray-200'
+              }`}
             />
+            {errors.query && (
+              <p className="text-sm text-red-500 mt-1">{errors.query}</p>
+            )}
           </div>
           <button
             type="button"
@@ -119,10 +174,15 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                   value={location.latitude === 0 ? '' : location.latitude} 
                   step="any"
                   onChange={(e) => handleCoordinateChange('latitude', e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    errors.latitude ? 'border-red-500' : 'border-gray-200'
+                  }`}
                   min="-90"
                   max="90"
                 />
+                {errors.latitude && (
+                  <p className="text-sm text-red-500 mt-1">{errors.latitude}</p>
+                )}
               </div>
               <div>
                 <label htmlFor="longitude" className="block text-sm text-gray-500 mb-1">
@@ -135,10 +195,15 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                   value={location.longitude === 0 ? '' : location.longitude} 
                   placeholder="-180 to 180"
                   onChange={(e) => handleCoordinateChange('longitude', e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    errors.longitude ? 'border-red-500' : 'border-gray-200'
+                  }`}
                   min="-180"
                   max="180"
                 />
+                {errors.longitude && (
+                  <p className="text-sm text-red-500 mt-1">{errors.longitude}</p>
+                )}
               </div>
             </div>
           )}
