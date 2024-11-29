@@ -28,13 +28,39 @@ describe('SearchBar', () => {
     expect(mockOnSearch).toHaveBeenCalledWith('New York', { latitude: undefined, longitude: undefined });
   });
 
-  it('does not call onSearch if the input is empty', async () => {
+  it('shows error message when only latitude is provided', async () => {
     const mockOnSearch = vi.fn();
     render(<SearchBar onSearch={mockOnSearch} />);
+
+    // Open the coordinates input section
+    const toggleButton = screen.getByText(/enter coordinates manually/i);
+    fireEvent.click(toggleButton);
+
+    const latitudeInput = screen.getByLabelText('Latitude');
+    fireEvent.change(latitudeInput, { target: { value: '40' } });
 
     const submitButton = screen.getByText('Search');
     fireEvent.click(submitButton);
 
     expect(mockOnSearch).not.toHaveBeenCalled();
+    expect(screen.getByText(/longitude is required when latitude is provided/i)).toBeInTheDocument();
+  });
+
+  it('shows error message when only longitude is provided', async () => {
+    const mockOnSearch = vi.fn();
+    render(<SearchBar onSearch={mockOnSearch} />);
+
+    // Open the coordinates input section
+    const toggleButton = screen.getByText(/enter coordinates manually/i);
+    fireEvent.click(toggleButton);
+
+    const longitudeInput = screen.getByLabelText('Longitude');
+    fireEvent.change(longitudeInput, { target: { value: '-74' } });
+
+    const submitButton = screen.getByText('Search');
+    fireEvent.click(submitButton);
+
+    expect(mockOnSearch).not.toHaveBeenCalled();
+    expect(screen.getByText(/latitude is required when longitude is provided/i)).toBeInTheDocument();
   });
 });
