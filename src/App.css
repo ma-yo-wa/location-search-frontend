@@ -1,42 +1,74 @@
-#root {
-  max-width: 1280px;
+.app {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 40px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.header {
+  margin-bottom: 20px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+body {
+  background-color: red;
+  color: #232426;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: all .3s
+}
+
+h1 {
+  color: #001b66;;
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1.14
+}
+
+.title {
+  font-size: 24px;
+  color: #333;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+.backButton {
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 2.6rem;
   }
-  to {
-    transform: rotate(360deg);
+  .app {
+    padding: 30px;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  .content {
+    flex-direction: column;
+  }
+  .app {
+    padding: 20px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-start;
   }
 }
 
-.card {
-  padding: 2em;
-}
 
-.read-the-docs {
-  color: #888;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
