@@ -4,16 +4,19 @@ import { SearchResults } from './components/SearchResults'
 import { MapView } from './components/MapView'
 import { useLocationSearch } from './hooks/useLocationSearch'
 import { SearchResult } from './types'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function App() {
-  const { results, loading, error, search } = useLocationSearch()
+  const { results, loading, error, search, currentPage, totalPages, nextPage, previousPage } = useLocationSearch()
   const [selectedLocation, setSelectedLocation] = useState<SearchResult | null>(null)
 
   const handleSearch = async (query: string, location: { latitude: number; longitude: number }) => {
+    console.log(location, 'hjhjh')
     await search({
       q: query,
       latitude: location.latitude,
-      longitude: location.longitude
+      longitude: location.longitude,
+      page: 1,
     })
   }
 
@@ -29,6 +32,24 @@ export default function App() {
               loading={loading}
               onResultClick={setSelectedLocation}
             />
+            <div className="flex justify-between">
+              <button 
+                onClick={previousPage} 
+                disabled={currentPage === 1} 
+                className="btn flex items-center"
+              >
+                <ChevronLeft className="mr-2" />
+                Previous
+              </button>
+              <button 
+                onClick={nextPage} 
+                disabled={currentPage === totalPages} 
+                className="btn flex items-center"
+              >
+                Next
+                <ChevronRight className="ml-2" />
+              </button>
+            </div>
           </div>
           <div>
             <MapView 

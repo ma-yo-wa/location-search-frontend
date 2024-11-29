@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { MapPin, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface SearchBarProps {
-  onSearch: (query: string, location: { latitude: number; longitude: number }) => Promise<void>;
+  onSearch: (query: string, location: { latitude?: number; longitude?: number }) => Promise<void>;
 }
 
 export function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("")
-  const [location, setLocation] = useState<{ latitude: number; longitude: number }>({ latitude: 0, longitude: 0 })
+  const [location, setLocation] = useState<{ latitude?: number; longitude?: number }>({ latitude: undefined, longitude: undefined })
   const [isLocating, setIsLocating] = useState(false)
   const [showCoordinates, setShowCoordinates] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string | undefined }>({})
@@ -20,12 +20,10 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   }
 
   const getCurrentLocation = () => {
-    console.log('hjhjhj')
     setIsLocating(true)
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log(position, 'jkjkj')
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -47,10 +45,9 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   const validateInputs = (): boolean => {
     const newErrors: typeof errors = {};
     const hasSearchQuery = query.trim().length > 0;
-    const hasLatitude = location.latitude !== 0;
-    const hasLongitude = location.longitude !== 0;
+    const hasLatitude = location.latitude !== undefined;
+    const hasLongitude = location.longitude !== undefined;
 
-   
     if (!hasSearchQuery && !hasLatitude && !hasLongitude) {
       newErrors.query = "Please enter a search term or coordinates";
       return false;
@@ -74,7 +71,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
     if (value === '') {
       setLocation(prev => ({
         ...prev,
-        [type]: 0
+        [type]: undefined
       }));
       return;
     }
@@ -104,7 +101,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
     
     // If user starts typing a search query, clear coordinates
     if (e.target.value.trim().length >= 2) {
-      setLocation({ latitude: 0, longitude: 0 });
+      setLocation({ latitude: undefined, longitude: undefined });
     }
   };
 
@@ -171,7 +168,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                   id="latitude"
                   type="number"
                   placeholder="-90 to 90"
-                  value={location.latitude === 0 ? '' : location.latitude} 
+                  value={location.latitude === undefined ? '' : location.latitude} 
                   step="any"
                   onChange={(e) => handleCoordinateChange('latitude', e.target.value)}
                   className={`w-full px-4 py-2 border rounded-lg ${
@@ -192,7 +189,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                   id="longitude"
                   type="number"
                   step="any"
-                  value={location.longitude === 0 ? '' : location.longitude} 
+                  value={location.longitude === undefined ? '' : location.longitude} 
                   placeholder="-180 to 180"
                   onChange={(e) => handleCoordinateChange('longitude', e.target.value)}
                   className={`w-full px-4 py-2 border rounded-lg ${
@@ -210,7 +207,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
 
           {showCoordinates && location && (
             <p className="text-sm text-gray-500 mt-4">
-              Current coordinates: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+              Current coordinates: {location.latitude?.toFixed(4)}, {location.longitude?.toFixed(4)}
             </p>
           )}
         </div>

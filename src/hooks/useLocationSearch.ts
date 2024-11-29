@@ -6,31 +6,59 @@ interface SearchParams {
   q?: string;
   latitude?: number;
   longitude?: number;
+  page?: number;
+  limit?: number;
 }
 
 interface SearchResponse {
   success: boolean;
   results: SearchResult[];
   error?: string;
+  meta?: {
+    page: number;
+    limit: number;
+    total: number;
+  };
 }
 
 export function useLocationSearch() {
+  const [currentQuery, setCurrentQuery] = useState('');
+  const [currentLatitude, setCurrentLatitude] = useState<number | undefined>(undefined);
+  const [currentLongitude, setCurrentLongitude] = useState<number | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const search = async ({ q, latitude, longitude }: SearchParams) => {
+  const search = async ({ q, latitude, longitude, page = 1, limit = 10 }: SearchParams) => {
     setLoading(true);
     setError(null);
 
+    console.log(currentLatitude, 'hhhhh')
+
     try {
+      if (latitude !== undefined) {
+        setCurrentLatitude(latitude);
+      }
+      if (longitude !== undefined) {
+        setCurrentLongitude(longitude);
+      }
+      setCurrentQuery(q ?? currentQuery);
+
       const params = new URLSearchParams();
       if (q) params.append('q', q);
-      if (latitude) params.append('latitude', latitude.toString());
-      if (longitude) params.append('longitude', longitude.toString());
+      if (currentLatitude !== undefined) {
+        params.append('latitude', currentLatitude.toString());
+      }
+      if (currentLongitude !== undefined) {
+        params.append('longitude', currentLongitude.toString());
+      }
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
 
       const response = await fetch(
-        `https://location-search-backend.onrender.com/search?${params}`
+        `http://localhost:3000/search?${params}`
       );
 
       if (!response.ok) {
@@ -44,6 +72,8 @@ export function useLocationSearch() {
       }
 
       setResults(data.results);
+      setCurrentPage(data.meta?.page || 1);
+      setTotalPages(Math.ceil((data.meta?.total || 0) / limit));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setResults([]);
@@ -52,10 +82,41 @@ export function useLocationSearch() {
     }
   };
 
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      search({
+        q: currentQuery,
+        latitude: currentLatitude !== undefined ? currentLatitude : undefined,
+        longitude: currentLongitude !== undefined ? currentLongitude : undefined,
+        page: currentPage + 1,
+      });
+    }
+  };
+
+  const previousPage = () => {
+    if (currentPage > 1) {
+      search({
+        q: currentQuery,
+        latitude: currentLatitude !== undefined ? currentLatitude : undefined,
+        longitude: currentLongitude !== undefined ? currentLongitude : undefined,
+        page: currentPage - 1,
+      });
+    }
+  };
+
+  const updateQuery = (query: string) => {
+    setCurrentQuery(query);
+  };
+
   return {
     results,
     loading,
     error,
-    search
+    search,
+    currentPage,
+    totalPages,
+    nextPage,
+    previousPage,
+    updateQuery,
   };
 }
