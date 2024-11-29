@@ -62,3 +62,5 @@ The search functionality supports the following features:
    ```
 - **Styling**: The application uses Tailwind CSS for styling, providing a responsive and modern design.
 
+## Important Note
+Because I am using a free instance on Render.com to deploy, the service will spin down with inactivity, which can delay request on first load by 50 seconds or more.
