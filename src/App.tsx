@@ -32,8 +32,11 @@ export default function App() {
           </div>
           <div>
             <MapView 
-              latitude={selectedLocation?.latitude ?? 43.6224}
-              longitude={selectedLocation?.longitude ?? -79.6808}
+              results={results}
+              selectedLocation={selectedLocation}
+              onMarkerClick={setSelectedLocation}
+              defaultLatitude={43.6224}
+              defaultLongitude={-79.6808}
             />
           </div>
         </div>
