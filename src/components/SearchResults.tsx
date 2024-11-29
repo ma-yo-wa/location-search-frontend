@@ -41,7 +41,7 @@ export function SearchResults({ results, loading, onResultClick }: SearchResults
               <div>
                 <h3 className="font-semibold">{result.street}</h3>
                 <p className="text-sm text-gray-500">
-                  {result.city}, {result.zip_code}
+                  {result.city}, {result.zipCode}
                 </p>
               </div>
               <div className="text-right">
@@ -74,7 +74,7 @@ export function SearchResults({ results, loading, onResultClick }: SearchResults
               </div>
               <div className="flex items-center gap-2 pl-6">
                 <span className="text-gray-500">
-                  Timezone: {result.time_zone}
+                  Timezone: {result.timeZone}
                 </span>
               </div>
             </div>
