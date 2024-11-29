@@ -20,14 +20,23 @@ To install and run the application, follow these steps:
    npm install
    ```
 
-3. **Start the Application**:
-   You can start the application in development mode using:
+3. **Set Up Environment Variables**:
+   - Copy the example environment file to create your own `.env` file:
+     ```bash
+     cp .env.example .env
+     ```
+   - Open the `.env` file and set the base API URL:
+     ```plaintext
+     VITE_API_BASE_URL=http://localhost:3000
+     ```
+
+4. **Run the Development Server**:
    ```bash
    npm run dev
    ```
 
-4. **Access the Application**:
-   Open your browser and navigate to `http://localhost:5173` to access the application.
+5. **Open Your Browser**:
+   - Navigate to `http://localhost:5173` to view the application.
 
 ## Approach and Design Decisions
 

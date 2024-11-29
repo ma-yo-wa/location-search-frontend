@@ -10,8 +10,7 @@ export default function App() {
   const { results, loading, error, search, currentPage, totalPages, nextPage, previousPage } = useLocationSearch()
   const [selectedLocation, setSelectedLocation] = useState<SearchResult | null>(null)
 
-  const handleSearch = async (query: string, location: { latitude: number; longitude: number }) => {
-    console.log(location, 'hjhjh')
+  const handleSearch = async (query: string, location: { latitude?: number; longitude?: number }) => {
     await search({
       q: query,
       latitude: location.latitude,

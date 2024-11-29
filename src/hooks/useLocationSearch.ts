@@ -35,8 +35,6 @@ export function useLocationSearch() {
     setLoading(true);
     setError(null);
 
-    console.log(currentLatitude, 'hhhhh')
-
     try {
       if (latitude !== undefined) {
         setCurrentLatitude(latitude);
@@ -57,9 +55,7 @@ export function useLocationSearch() {
       params.append('page', page.toString());
       params.append('limit', limit.toString());
 
-      const response = await fetch(
-        `http://localhost:3000/search?${params}`
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/search?${params}`);
 
       if (!response.ok) {
         throw new Error('Search failed');
@@ -86,8 +82,8 @@ export function useLocationSearch() {
     if (currentPage < totalPages) {
       search({
         q: currentQuery,
-        latitude: currentLatitude !== undefined ? currentLatitude : undefined,
-        longitude: currentLongitude !== undefined ? currentLongitude : undefined,
+        latitude: currentLatitude,
+        longitude: currentLongitude,
         page: currentPage + 1,
       });
     }
@@ -97,8 +93,8 @@ export function useLocationSearch() {
     if (currentPage > 1) {
       search({
         q: currentQuery,
-        latitude: currentLatitude !== undefined ? currentLatitude : undefined,
-        longitude: currentLongitude !== undefined ? currentLongitude : undefined,
+        latitude: currentLatitude,
+        longitude: currentLongitude,
         page: currentPage - 1,
       });
     }
