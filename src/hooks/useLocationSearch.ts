@@ -30,7 +30,7 @@ export function useLocationSearch() {
       if (longitude) params.append('longitude', longitude.toString());
 
       const response = await fetch(
-        `http://location-search-backend.onrender.com/search?${params}`
+        `https://location-search-backend.onrender.com/search?${params}`
       );
 
       if (!response.ok) {
